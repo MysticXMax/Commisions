@@ -1,70 +1,90 @@
 (() => {
   "use strict";
 
+  const currentYear = new Date().getFullYear();
+
   const offers = [
     {
       id: "new-year",
-      name: "New Year Reset",
+      name: `New Year ${currentYear}`,
       start: [1, 1],
       end: [1, 6],
       discount: 10,
-      code: "NEWYEAR10",
+      code: `NEWYEAR${String(currentYear).slice(2)}`,
       copy: "Fresh-year avatar edits, file cleanup, and new look planning.",
+      dates: "Jan 1 - Jan 6",
+      description: "10% off fresh avatar edits, file cleanup, and planning.",
     },
     {
       id: "spring-sale",
-      name: "Spring Refresh",
+      name: `Spring ${currentYear}`,
       start: [3, 20],
       end: [4, 5],
       discount: 10,
-      code: "SPRING10",
+      code: `SPRING${String(currentYear).slice(2)}`,
       copy: "Bright texture edits and fresh spring style changes.",
+      dates: "Mar 20 - Apr 5",
+      description: "10% off bright texture edits and fresh style changes.",
     },
     {
       id: "summer-sale",
-      name: "Summer Glow",
+      name: `Summer ${currentYear}`,
       start: [6, 10],
       end: [6, 24],
       discount: 12,
-      code: "SUMMER12",
+      code: `SUMMER${String(currentYear).slice(2)}`,
       copy: "Emission, Audiolink direction, and soft glow work.",
+      dates: "Jun 10 - Jun 24",
+      description:
+        "12% off emissions, Audiolink direction, and soft glow work.",
     },
     {
       id: "black-friday",
-      name: "Black Friday Slots",
+      name: `Black Friday ${currentYear}`,
       start: [11, 15],
       end: [11, 29],
       discount: 20,
-      code: "BLACK20",
+      code: `BLACK${String(currentYear).slice(2)}`,
       copy: "Gift-ready commissions booked before the December rush.",
+      dates: "Nov 15 - Nov 29",
+      description:
+        "20% off gift-ready commissions booked before the December rush.",
     },
     {
       id: "holiday-prep",
-      name: "Holiday Prep Week",
+      name: `Holiday Prep ${currentYear}`,
       start: [11, 30],
       end: [12, 6],
       discount: 15,
-      code: "HOLIDAY15",
+      code: `HOLIDAY${String(currentYear).slice(2)}`,
       copy: "Premium and higher setup requests during Holiday Prep Week.",
       minimumPrice: 20,
+      dates: "Nov 30 - Dec 6",
+      description: "15% off Premium and higher setup requests.",
     },
     {
       id: "christmas-warmup",
-      name: "Christmas Warm-Up",
+      name: `Christmas ${currentYear}`,
       start: [12, 7],
       end: [12, 19],
       discount: 18,
-      code: "WARM18",
+      code: `WARM${String(currentYear).slice(2)}`,
       copy: "Final pre-Christmas planning slots before the holiday queue closes.",
+      dates: "Dec 7 - Dec 19",
+      description:
+        "18% off final pre-Christmas planning before the queue closes.",
     },
     {
       id: "christmas",
-      name: "Christmas Thank You",
+      name: `Christmas Thank You ${currentYear}`,
       start: [12, 20],
       end: [12, 26],
       discount: 25,
-      code: "XMAS25",
+      code: `XMAS${String(currentYear).slice(2)}`,
       copy: "New-year planning deposits while holiday slots last.",
+      dates: "Dec 20 - Dec 26",
+      description:
+        "25% off new-year planning deposits while holiday slots last.",
     },
   ];
 
@@ -94,6 +114,24 @@
   const saleCountdown = document.querySelector("[data-sale-countdown]");
   const overlayClosed = document.getElementById("overlay-closed");
   const closedContent = document.querySelector("[data-closed-content]");
+  const offerGrid = document.getElementById("offerGrid");
+
+  const renderOfferCards = () => {
+    if (!offerGrid) return;
+    offerGrid.innerHTML = "";
+    offers.forEach((offer) => {
+      const article = document.createElement("article");
+      article.className = "offer-card";
+      article.dataset.offerCard = offer.id;
+      article.innerHTML = `
+        <span>${offer.dates}</span>
+        <h3>${offer.name}</h3>
+        <p>${offer.description}</p>
+        <strong data-offer-code="${offer.id}">Loading...</strong>
+      `;
+      offerGrid.appendChild(article);
+    });
+  };
 
   const makeDate = (year, pair, endOfDay = false) => {
     const [month, day] = pair;
@@ -110,15 +148,19 @@
   const rangeFor = (offer, year) => {
     const start = makeDate(year, offer.start);
     const end = makeDate(year, offer.end, true);
-    if (end < start) end.setFullYear(end.getFullYear() + 1);
     return { offer, start, end };
   };
 
   const allRanges = (now) => {
     const year = now.getFullYear();
-    return [year - 1, year, year + 1].flatMap((rangeYear) =>
-      offers.map((offer) => rangeFor(offer, rangeYear)),
-    );
+    const ranges = [];
+    offers.forEach((offer) => {
+      const range = rangeFor(offer, year);
+      if (range.end >= range.start) {
+        ranges.push(range);
+      }
+    });
+    return ranges;
   };
 
   const getOfferState = (now = new Date()) => {
@@ -129,7 +171,10 @@
     const next = ranges
       .filter((range) => range.start > now)
       .sort((a, b) => a.start - b.start)[0];
-    return { current: current || null, next: next || null };
+    const ended = ranges
+      .filter((range) => range.end < now)
+      .sort((a, b) => b.end - a.end);
+    return { current: current || null, next: next || null, ended: ended || [] };
   };
 
   const getClosureState = (now = new Date()) => {
@@ -164,21 +209,31 @@
     if (node) node.textContent = value;
   };
 
-  const updateOfferCards = (current, next) => {
+  const updateOfferCodes = () => {
+    document.querySelectorAll("[data-offer-code]").forEach((el) => {
+      const offerId = el.dataset.offerCode;
+      const offer = offers.find((o) => o.id === offerId);
+      if (offer) {
+        el.textContent = `Code ${offer.code}`;
+      }
+    });
+  };
+
+  const updateOfferCards = (current, next, ended) => {
     document.querySelectorAll("[data-offer-card]").forEach((card) => {
-      card.classList.toggle(
-        "is-active",
-        current?.offer.id === card.dataset.offerCard,
-      );
-      card.classList.toggle(
-        "is-next",
-        !current && next?.offer.id === card.dataset.offerCard,
-      );
+      const cardId = card.dataset.offerCard;
+      const isEnded = ended.some((e) => e.offer.id === cardId);
+      const isActive = current?.offer.id === cardId;
+      const isNext = !current && next?.offer.id === cardId;
+
+      card.classList.toggle("is-active", isActive);
+      card.classList.toggle("is-next", isNext);
+      card.classList.toggle("is-ended", isEnded && !isActive);
     });
   };
 
   const updateSaleBanner = (state) => {
-    const { current, next } = state;
+    const { current, next, ended } = state;
 
     if (current) {
       const { offer, end } = current;
@@ -186,7 +241,18 @@
       setText(saleCopy, `${offer.discount}% off ${offer.copy}`);
       setText(saleCode, `Use ${offer.code}`);
       setText(saleCountdown, `Ends in ${formatDuration(end - new Date())}`);
-      updateOfferCards(current, next);
+      updateOfferCards(current, next, ended);
+      return;
+    }
+
+    if (ended.length > 0 && !current) {
+      const latestEnded = ended[0];
+      const { offer } = latestEnded;
+      setText(saleTitle, `${offer.name} has ended`);
+      setText(saleCopy, `This offer has expired. Check back for new deals.`);
+      setText(saleCode, `Code expired`);
+      setText(saleCountdown, `Ended`);
+      updateOfferCards(null, next, ended);
       return;
     }
 
@@ -196,7 +262,7 @@
       setText(saleCopy, `${offer.discount}% off ${offer.copy}`);
       setText(saleCode, `Code ${offer.code}`);
       setText(saleCountdown, `Starts ${formatDate(start)}`);
-      updateOfferCards(null, next);
+      updateOfferCards(null, next, ended);
       return;
     }
 
@@ -204,7 +270,7 @@
     setText(saleCopy, "New holiday discounts will appear here when scheduled.");
     setText(saleCode, "No active code");
     setText(saleCountdown, "Open now");
-    updateOfferCards(null, null);
+    updateOfferCards(null, null, ended);
   };
 
   const updateClosureOverlay = (state) => {
@@ -231,6 +297,7 @@
     const now = new Date();
     const offerState = getOfferState(now);
     const closureState = getClosureState(now);
+    updateOfferCodes();
     updateSaleBanner(offerState);
     updateClosureOverlay(closureState);
     document.dispatchEvent(
@@ -238,6 +305,7 @@
         detail: {
           current: offerState.current?.offer || null,
           next: offerState.next?.offer || null,
+          ended: offerState.ended.map((e) => e.offer) || [],
         },
       }),
     );
@@ -247,8 +315,10 @@
     offers,
     getCurrentOffer: () => getOfferState().current?.offer || null,
     getNextOffer: () => getOfferState().next?.offer || null,
+    getEndedOffers: () => getOfferState().ended.map((e) => e.offer) || [],
   };
 
+  renderOfferCards();
   render();
   setInterval(render, 1000);
 })();

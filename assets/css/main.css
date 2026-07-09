@@ -35,7 +35,13 @@ body {
     linear-gradient(180deg, rgba(14, 18, 22, 0.96), rgba(14, 18, 22, 1)),
     var(--ink);
   color: var(--text);
-  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family:
+    "Inter",
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
   line-height: 1.6;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -134,7 +140,11 @@ ol {
   place-items: center;
   border: 1px solid rgba(101, 224, 189, 0.5);
   border-radius: var(--radius);
-  background: linear-gradient(135deg, rgba(101, 224, 189, 0.22), rgba(255, 121, 107, 0.16));
+  background: linear-gradient(
+    135deg,
+    rgba(101, 224, 189, 0.22),
+    rgba(255, 121, 107, 0.16)
+  );
   color: var(--paper);
   flex: 0 0 auto;
 }
@@ -269,7 +279,12 @@ ol {
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(14, 18, 22, 0.94) 0%, rgba(14, 18, 22, 0.64) 46%, rgba(14, 18, 22, 0.2) 100%),
+    linear-gradient(
+      90deg,
+      rgba(14, 18, 22, 0.94) 0%,
+      rgba(14, 18, 22, 0.64) 46%,
+      rgba(14, 18, 22, 0.2) 100%
+    ),
     linear-gradient(0deg, rgba(14, 18, 22, 1) 0%, rgba(14, 18, 22, 0) 44%);
 }
 
@@ -471,12 +486,20 @@ ol {
 
 .package-card.highlighted {
   border-color: rgba(101, 224, 189, 0.5);
-  background: linear-gradient(180deg, rgba(101, 224, 189, 0.12), rgba(255, 255, 255, 0.045));
+  background: linear-gradient(
+    180deg,
+    rgba(101, 224, 189, 0.12),
+    rgba(255, 255, 255, 0.045)
+  );
 }
 
 .package-card.showcase {
   border-color: rgba(240, 189, 89, 0.5);
-  background: linear-gradient(180deg, rgba(240, 189, 89, 0.12), rgba(255, 255, 255, 0.045));
+  background: linear-gradient(
+    180deg,
+    rgba(240, 189, 89, 0.12),
+    rgba(255, 255, 255, 0.045)
+  );
 }
 
 .package-topline {
@@ -971,6 +994,22 @@ input[type="checkbox"] {
   border-color: var(--line-strong);
   color: var(--text);
   outline: none;
+}
+
+.offer-card.is-ended {
+  opacity: 0.5;
+  filter: grayscale(0.8);
+  position: relative;
+}
+
+.offer-card.is-ended span {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.offer-card.is-ended strong {
+  text-decoration: line-through;
+  opacity: 0.5;
 }
 
 @media (max-width: 1180px) {
