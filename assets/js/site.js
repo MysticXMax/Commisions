@@ -40,8 +40,9 @@ window.addEventListener("DOMContentLoaded", async function () {
   let previousNum = null;
   let isChanging = false;
 
-  img.style.transition = "opacity 0.8s ease-in-out";
+  img.style.transition = "opacity 1s ease-in-out";
   img.style.willChange = "opacity";
+  img.style.opacity = "0";
 
   async function getRandomAvatar() {
     const availableNumbers = numbers.filter((n) => n !== previousNum);
@@ -104,7 +105,7 @@ window.addEventListener("DOMContentLoaded", async function () {
         img.style.opacity = "1";
       });
 
-      await new Promise((resolve) => setTimeout(resolve, 800));
+      await new Promise((resolve) => setTimeout(resolve, 1200));
     } else {
       console.error("No avatar images found!");
       img.style.opacity = "1";
@@ -118,7 +119,20 @@ window.addEventListener("DOMContentLoaded", async function () {
     img.src = initialResult.url;
     img.alt = `Avatar ${initialResult.num}`;
     previousNum = initialResult.num;
-    img.style.opacity = "1";
+
+    await new Promise((resolve) => {
+      if (img.complete) {
+        resolve();
+      } else {
+        img.onload = resolve;
+      }
+    });
+
+    await new Promise((resolve) => setTimeout(resolve, 300));
+
+    requestAnimationFrame(() => {
+      img.style.opacity = "1";
+    });
   }
 
   setInterval(changeAvatar, 15000);

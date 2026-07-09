@@ -81,17 +81,7 @@ app.post("/submit", upload.array("file"), async (req, res) => {
         value: stripEmojis(trimValue(clothing || "None")),
         inline: true,
       },
-      {
-        name: "Mood",
-        value: stripEmojis(trimValue(mood || "Not specified")),
-        inline: true,
-      },
       { name: "Extras", value: stripEmojis(trimValue(extras)), inline: true },
-      {
-        name: "Timeline",
-        value: stripEmojis(trimValue(timeline || "Not specified")),
-        inline: true,
-      },
       {
         name: "Payment",
         value: stripEmojis(trimValue(payment || "Not specified")),
