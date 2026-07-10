@@ -222,8 +222,16 @@
         const formatted = Number.isInteger(discounted)
           ? discounted
           : discounted.toFixed(2);
+
         card.classList.add("has-sale");
+        basePriceEl.style.textDecoration = "line-through";
+        basePriceEl.style.color = "#71717a";
         salePriceEl.textContent = `EUR ${formatted}`;
+      } else {
+        card.classList.remove("has-sale");
+        basePriceEl.style.textDecoration = "none";
+        basePriceEl.style.color = "";
+        salePriceEl.textContent = "";
       }
     });
   }
